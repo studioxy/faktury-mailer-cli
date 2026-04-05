@@ -1,0 +1,6 @@
+{
+  "workspaceDir": "./data",
+  "contractsFile": "./kontrahenci.xlsx",
+  "invoicesPath": ".",
+  "reportDir": "../reports"
+}

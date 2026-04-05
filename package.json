@@ -1,0 +1,25 @@
+{
+  "name": "faktury-mailer-cli",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/cli.ts"
+  },
+  "dependencies": {
+    "commander": "^13.1.0",
+    "dotenv": "^16.6.1",
+    "gaxios": "^7.1.4",
+    "googleapis": "^150.0.1",
+    "pdf-parse": "^1.1.1",
+    "xlsx": "^0.18.5",
+    "yauzl": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "@types/yauzl": "^2.10.3",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2"
+  }
+}
