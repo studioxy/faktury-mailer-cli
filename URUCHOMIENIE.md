@@ -2,6 +2,14 @@
 
 ## Szybki start
 
+Najkrótsze 3 komendy startowe:
+
+```powershell
+git clone https://github.com/studioxy/faktury-mailer-cli.git
+cd faktury-mailer-cli
+npm install
+```
+
 1. Sklonuj repo:
 
 ```powershell
