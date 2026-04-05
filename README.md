@@ -80,7 +80,7 @@ npm run dev -- --config ./config.json
 Najprostsza droga:
 
 ```bash
-git clone <URL_REPO>
+git clone https://github.com/studioxy/faktury-mailer-cli.git
 cd faktury-mailer-cli
 npm install
 ```
