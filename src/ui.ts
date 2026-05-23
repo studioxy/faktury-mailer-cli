@@ -73,10 +73,10 @@ export function createConsoleUi(): ConsoleUi {
         const frame = FRAMES[frameIndex % FRAMES.length];
         frameIndex += 1;
         process.stdout.write(
-          `\r${colorize(colorEnabled, BLUE, frame)} ${emphasis(colorEnabled, label)} ${dim(
+          `\r\x1b[K${colorize(colorEnabled, BLUE, frame)} ${emphasis(colorEnabled, label)} ${dim(
             colorEnabled,
             currentMessage,
-          )}   `,
+          )}`,
         );
       };
 
@@ -91,7 +91,7 @@ export function createConsoleUi(): ConsoleUi {
         if (timer) {
           clearInterval(timer);
           timer = undefined;
-          process.stdout.write("\r");
+          process.stdout.write("\r\x1b[K");
         }
         const finalMessage = message ?? currentMessage;
         console.log(
