@@ -1,5 +1,5 @@
 import { createWriteStream } from "node:fs";
-import { mkdir, mkdtemp, readdir, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, rm, stat } from "node:fs/promises";
 import { basename, extname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -65,17 +65,37 @@ async function extractZip(zipPath: string): Promise<string[]> {
 
 export async function resolveInvoicePaths(path: string | URL): Promise<string[]> {
   const resolvedPath = toPath(path);
+  const pathInfo = await stat(resolvedPath);
 
-  if (extname(resolvedPath).toLowerCase() === ".zip") {
+  if (pathInfo.isFile() && extname(resolvedPath).toLowerCase() === ".pdf") {
+    return [resolvedPath];
+  }
+
+  if (pathInfo.isFile() && extname(resolvedPath).toLowerCase() === ".zip") {
     return extractZip(resolvedPath);
   }
 
   const entries = await readdir(resolvedPath, { withFileTypes: true });
+  const invoicePaths: string[] = [];
 
-  return entries
-    .filter((entry) => entry.isFile() && extname(entry.name).toLowerCase() === ".pdf")
-    .map((entry) => join(resolvedPath, entry.name))
-    .sort();
+  for (const entry of entries) {
+    if (!entry.isFile()) {
+      continue;
+    }
+
+    const entryPath = join(resolvedPath, entry.name);
+    const extension = extname(entry.name).toLowerCase();
+
+    if (extension === ".pdf") {
+      invoicePaths.push(entryPath);
+    }
+
+    if (extension === ".zip") {
+      invoicePaths.push(...(await extractZip(entryPath)));
+    }
+  }
+
+  return invoicePaths.sort();
 }
 
 export async function cleanupTempDirs(): Promise<void> {
