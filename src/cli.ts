@@ -53,14 +53,26 @@ export async function runWorkflow(config: RuntimeConfig): Promise<WorkflowResult
 
   try {
     const extractStep = ui.createStep("Extracting PDF data");
-    for (const invoicePath of limitedInvoicePaths) {
-      extractStep.update(`${invoiceMetadata.length + parseErrors.length + 1}/${limitedInvoicePaths.length} ${basename(invoicePath)}`);
-      try {
-        invoiceMetadata.push(await extractInvoiceMetadata(invoicePath));
-      } catch (error) {
-        parseErrors.push(buildPdfReadError(invoicePath, error));
+    const CONCURRENCY_LIMIT = 10;
+    const pathsIterator = limitedInvoicePaths.values();
+
+    const worker = async () => {
+      for (const invoicePath of pathsIterator) {
+        try {
+          const metadata = await extractInvoiceMetadata(invoicePath);
+          invoiceMetadata.push(metadata);
+        } catch (error) {
+          parseErrors.push(buildPdfReadError(invoicePath, error));
+        }
+        extractStep.update(`${invoiceMetadata.length + parseErrors.length}/${limitedInvoicePaths.length} ${basename(invoicePath)}`);
       }
-    }
+    };
+
+    const workers = Array.from(
+      { length: Math.min(CONCURRENCY_LIMIT, limitedInvoicePaths.length) },
+      () => worker()
+    );
+    await Promise.all(workers);
     if (parseErrors.length > 0) {
       extractStep.warn(
         `${invoiceMetadata.length} parsed, ${parseErrors.length} failed to parse`,
